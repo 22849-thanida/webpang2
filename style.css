@@ -35,7 +35,141 @@ body {
 }
 
 /* ========================================
-   2. Realistic Deep Ocean Background System
+   2. Grand Entrance Curtain & Shockwave Effect
+======================================== */
+.ocean-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #0a4b6e 0%, #032139 50%, #010a15 100%);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1), filter 1.2s ease, opacity 1.2s ease;
+}
+
+.ocean-curtain.open {
+    transform: scale(2.5);
+    filter: blur(30px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.curtain-content {
+    max-width: 600px;
+    padding: 20px;
+    z-index: 2;
+}
+
+.glow-portal {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 25px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.portal-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    border-top-color: var(--accent-neon-cyan);
+    border-bottom-color: var(--coral-pink);
+    border-radius: 50%;
+    animation: spinRing 3s linear infinite;
+    box-shadow: 0 0 25px var(--accent-neon-cyan);
+}
+
+@keyframes spinRing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.portal-icon {
+    font-size: 3.5rem;
+    filter: drop-shadow(0 0 15px var(--coral-pink));
+}
+
+.curtain-title {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.curtain-title span {
+    color: var(--accent-neon-cyan);
+    text-shadow: 0 0 20px var(--accent-neon-cyan);
+}
+
+.curtain-sub {
+    color: var(--text-dim);
+    font-size: 1rem;
+    margin-bottom: 35px;
+}
+
+.enter-btn {
+    background: linear-gradient(45deg, #00bbf9, #00f5d4, #ff70a6);
+    background-size: 200% 200%;
+    border: none;
+    padding: 18px 45px;
+    border-radius: 50px;
+    color: #010a15;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(0, 245, 212, 0.6);
+    transition: all 0.3s ease;
+    animation: gradientShift 3s ease infinite, btnPulse 2s infinite;
+}
+
+.enter-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 50px rgba(0, 245, 212, 1), 0 0 20px rgba(255, 112, 166, 0.8);
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes btnPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.shockwave {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(0,245,212,0.8) 0%, rgba(255,112,166,0.4) 50%, transparent 70%);
+    border-radius: 50%;
+    z-index: 99998;
+    pointer-events: none;
+}
+
+.shockwave.active {
+    animation: shockwaveExplode 1.2s ease-out forwards;
+}
+
+@keyframes shockwaveExplode {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(150); opacity: 0; }
+}
+
+/* ========================================
+   3. Realistic Deep Ocean Background System
 ======================================== */
 .ocean-background {
     position: fixed;
@@ -48,7 +182,6 @@ body {
     overflow: hidden;
 }
 
-/* Underwater Sun Rays Effect */
 .sun-rays {
     position: absolute;
     top: -30%;
@@ -64,7 +197,6 @@ body {
     100% { opacity: 0.9; transform: scale(1.05); }
 }
 
-/* Bubbles Animation */
 .bubble {
     position: absolute;
     bottom: -50px;
@@ -84,7 +216,6 @@ body {
     100% { transform: translateY(-115vh) scale(1.2); opacity: 0; }
 }
 
-/* Swimming Animals */
 .sea-creature {
     position: absolute;
     font-size: 2.5rem;
@@ -112,7 +243,7 @@ body {
 }
 
 /* ========================================
-   3. Seabed, Rocks, Swaying Seaweed & Corals
+   4. Seabed, Rocks, Swaying Seaweed & Corals
 ======================================== */
 .sea-floor {
     position: absolute;
@@ -124,7 +255,6 @@ body {
     z-index: 1;
 }
 
-/* Underwater Rocks */
 .rock {
     position: absolute;
     bottom: -10px;
@@ -135,7 +265,6 @@ body {
 .rock.r1 { left: 5%; width: 180px; height: 80px; }
 .rock.r2 { right: 8%; width: 240px; height: 100px; }
 
-/* Swaying Seaweed */
 .seaweed {
     position: absolute;
     bottom: 0;
@@ -154,7 +283,6 @@ body {
     100% { transform: rotate(10deg) skewX(8deg); }
 }
 
-/* Glowing Corals */
 .coral {
     position: absolute;
     bottom: 15px;
@@ -165,7 +293,7 @@ body {
 .c2 { right: 12%; }
 
 /* ========================================
-   4. Glassmorphism Card System
+   5. Glassmorphism Card System
 ======================================== */
 .glass-card {
     background: var(--glass-bg);
@@ -186,7 +314,7 @@ body {
 }
 
 /* ========================================
-   5. Navigation Bar
+   6. Navigation Bar
 ======================================== */
 .navbar {
     position: sticky;
@@ -218,7 +346,7 @@ nav a.active::after {
 }
 
 /* ========================================
-   6. Buttons & Elements
+   7. Buttons & Elements
 ======================================== */
 .btn {
     display: inline-block;
@@ -246,7 +374,7 @@ nav a.active::after {
 .subtitle-center { text-align: center; color: var(--text-dim); margin-bottom: 40px; }
 
 /* ========================================
-   7. Layout & Media Queries
+   8. Layout & Responsive
 ======================================== */
 .container { width: 90%; max-width: 1100px; margin: 50px auto; flex: 1; z-index: 2; position: relative; }
 
