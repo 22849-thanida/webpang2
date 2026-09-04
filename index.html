@@ -8,6 +8,25 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- ฉากม่านเปิดตัวอลังการ (Grand Entrance Overlay) -->
+    <div id="ocean-curtain" class="ocean-curtain">
+        <div class="curtain-content">
+            <div class="glow-portal">
+                <div class="portal-ring"></div>
+                <div class="portal-icon">🪸</div>
+            </div>
+            <h1 class="curtain-title">REALISTIC OCEAN <span>DEPTH</span></h1>
+            <p class="curtain-sub">กดเพื่อดำดิ่งสู่โลกใต้ท้องทะเลระดับลึกพร้อมเอฟเฟกต์เสียงแบบเต็มรูปแบบ</p>
+            <button id="enter-btn" class="enter-btn">
+                <span>✨ เริ่มต้นการสำรวจ ✨</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ระเบิดคลื่นพลังน้ำ (Shockwave Effect) -->
+    <div id="shockwave" class="shockwave"></div>
+
+    <!-- พื้นหลังท้องทะเลและสิ่งมีชีวิต -->
     <div class="ocean-background">
         <div class="sun-rays"></div>
         <div class="bubble b1"></div>
@@ -30,6 +49,7 @@
         </div>
     </div>
 
+    <!-- เมนูนำทาง -->
     <header class="navbar">
         <div class="logo">OCEAN<span>DEPTH</span></div>
         <nav>
@@ -41,12 +61,13 @@
         </nav>
     </header>
 
+    <!-- เนื้อหาหลัก -->
     <main class="hero-section animate-fade-in">
         <div class="hero-content">
             <div class="badge">🪸 Deep Sea Reef Exploration</div>
-            <h1>สวัสดีค่ะ! ดิฉันชื่อ <span class="glow-text">ธนิดา ปันม้า</span></h1>
+            <h1>สวัสดีครับ! ผมชื่อ <span class="glow-text">[กรอกชื่อ]</span></h1>
             <p class="subtitle">นักเรียนชั้นมัธยมศึกษาปีที่ 3</p>
-            <p class="description">ยินดีต้อนรับสู่พอร์ตโฟลิโอในระบบนิเวศแนวปะการังใต้น้ำลึก รวบรวมตัวตน ทักษะ และผลงานของดิฉันไว้อย่างสมจริง</p>
+            <p class="description">ยินดีต้อนรับสู่พอร์ตโฟลิโอในระบบนิเวศแนวปะการังใต้น้ำลึก รวบรวมตัวตน ทักษะ และผลงานของผมไว้อย่างสมจริง</p>
             <div class="hero-buttons">
                 <a href="profile.html" class="btn btn-primary">รู้จักฉันมากขึ้น</a>
                 <a href="hobby.html" class="btn btn-secondary">ชมงานอดิเรก</a>
@@ -61,7 +82,68 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 ด.ญ.ธนิดา ปันม้า | ชั้น ม.3/2 | วิชาเขียนโปรแกรมGSMPระดับมัธยมศึกษา</p>
+        <p>&copy; 2026 [กรอกชื่อ] | ชั้น ม.3/[กรอกห้อง] | โครงงานคอมพิวเตอร์ระดับมัธยมศึกษา</p>
     </footer>
+
+    <!-- JavaScript ควบคุมแอนิเมชันเปิดตัวและระบบเสียง -->
+    <script>
+        document.getElementById('enter-btn').addEventListener('click', function() {
+            const curtain = document.getElementById('ocean-curtain');
+            const shockwave = document.getElementById('shockwave');
+
+            // เล่นเอฟเฟกต์เสียงใต้น้ำตระการตา
+            playEpicUnderwaterSound();
+
+            // แสดงเอฟเฟกต์ระเบิดคลื่นพลังงาน
+            shockwave.classList.add('active');
+
+            // เปิดม่านแหวกมิติ
+            curtain.classList.add('open');
+
+            // ซ่อนม่านหลังจากแอนิเมชันเสร็จสิ้น
+            setTimeout(() => {
+                curtain.style.display = 'none';
+            }, 1500);
+        });
+
+        function playEpicUnderwaterSound() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            
+            const ctx = new AudioContext();
+
+            // เสียง Deep Sub-Bass Drop
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(160, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 1.8);
+
+            gain.gain.setValueAtTime(0.01, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.0);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 3.0);
+
+            // เสียง Magic Swell เรืองแสง
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(300, ctx.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 1.2);
+
+            gain2.gain.setValueAtTime(0.01, ctx.currentTime);
+            gain2.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.5);
+            gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
+
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start();
+            osc2.stop(ctx.currentTime + 2.5);
+        }
+    </script>
 </body>
 </html>
