@@ -7,6 +7,85 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+    <!-- ฉากม่านเปิดตัวอลังการ (Grand Entrance Overlay) -->
+<div id="ocean-curtain" class="ocean-curtain">
+    <div class="curtain-content">
+        <div class="glow-portal">
+            <div class="portal-ring"></div>
+            <div class="portal-icon">🪸</div>
+        </div>
+        <h1 class="curtain-title">REALISTIC OCEAN <span>DEPTH</span></h1>
+        <p class="curtain-sub">กดเพื่อดำดิ่งสู่โลกใต้ท้องทะเลระดับลึกพร้อมเอฟเฟกต์เสียง</p>
+        <button id="enter-btn" class="enter-btn">
+            <span>✨ เริ่มต้นการสำรวจ ✨</span>
+        </button>
+    </div>
+</div>
+
+<!-- ระเบิดคลื่นพลังน้ำ (Shockwave Effect) -->
+<div id="shockwave" class="shockwave"></div>
+
+<!-- JavaScript ควบคุมเสียงและเอฟเฟกต์ -->
+<script>
+    document.getElementById('enter-btn').addEventListener('click', function() {
+        const curtain = document.getElementById('ocean-curtain');
+        const shockwave = document.getElementById('shockwave');
+
+        // 1. เล่นเอฟเฟกต์เสียงอลังการด้วย Web Audio API (ไม่ต้องพึ่งไฟล์ภายนอก)
+        playEpicUnderwaterSound();
+
+        // 2. เอฟเฟกต์ระเบิดคลื่นพลังงาน (Shockwave Burst)
+        shockwave.classList.add('active');
+
+        // 3. เปิดม่านแหวกมิติใต้น้ำ
+        curtain.classList.add('open');
+
+        // ลบ Overlay ออกเมื่อแอนิเมชันจบเพื่อไม่ให้บดบังการคลิก
+        setTimeout(() => {
+            curtain.style.display = 'none';
+        }, 1500);
+    });
+
+    // ฟังก์ชันสร้างเสียงสังเคราะห์ตระการตา (Epic Sub-Bass & Ocean Swell)
+    function playEpicUnderwaterSound() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        
+        const ctx = new AudioContext();
+
+        // เสียงเบสตลบหลังตระการตา (Deep Sub-Bass Drop)
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 1.8);
+
+        gain.gain.setValueAtTime(0.01, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.0);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 3.0);
+
+        // เสียงคลื่นน้ำเรืองแสง (High Magic Swell)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(300, ctx.currentTime);
+        osc2.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 1.2);
+
+        gain2.gain.setValueAtTime(0.01, ctx.currentTime);
+        gain2.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.5);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
+
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start();
+        osc2.stop(ctx.currentTime + 2.5);
+    }
+</script>
 <body>
     <div class="ocean-background">
         <div class="sun-rays"></div>
