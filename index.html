@@ -3,147 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realistic Ocean Portfolio | หน้าแรก</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Ocean Breeze Student Portfolio">
+    <title>OCEAN BREEZE PORTFOLIO | Home</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+        :root {
+            --sea-blue: #00b4d8;
+            --sea-deep: #0077b6;
+            --sea-foam: #caf0f8;
+            --sand-gold: #e9c46a;
+            --sand-light: #fefae0;
+            --coral-pink: #e76f51;
+            --night-ocean: #03045e;
+            --night-sky: #0a192f;
+            --text-dark: #1d3557;
+            --text-light: #f8f9fa;
+            --glass-bg: rgba(255, 255, 255, 0.42);
+            --glass-border: rgba(255, 255, 255, 0.65);
+            --ease: cubic-bezier(.2, .78, .25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Kanit', sans-serif;
+            color: var(--text-dark);
+            background: linear-gradient(180deg, #fefae0 0%, #caf0f8 25%, #90e0ef 60%, #00b4d8 100%);
+            transition: background 0.8s ease, color 0.5s ease;
+        }
+
+        body.night-mode {
+            color: var(--text-light);
+            background: linear-gradient(180deg, #020c1b 0%, #0a192f 40%, #0077b6 100%);
+        }
+
+        a { color: inherit; }
+        button, input, textarea { font: inherit; }
+        ::selection { background: #90e0ef; color: #03045e; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f9ff; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #e9c46a, #00b4d8, #0077b6);
+            border-radius: 20px;
+        }
+
+        /* Canvas for Floating Bubbles */
+        #bubbleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #mouseGlow {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            width: 300px;
+            height: 300px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            background: radial-gradient(circle, rgba(255,255,255,0.35), rgba(144,224,239,0.2) 40%, transparent 70%);
+            filter: blur(10px);
+            mix-blend-mode: screen;
+        }
+
+        /* Top Progress Bar */
+        .progress {
+            position: fixed;
+            left: 0; top: 0; width: 100%; height: 4px;
+            z-index: 2100; pointer-events: none;
+        }
+        .progress span {
+            display: block; width: 0%; height: 100%;
+            background: linear-gradient(90deg, #e9c46a, #90e0ef, #0077b6);
+            box-shadow: 0 0 10px rgba(0, 180, 216, 0.6);
+        }
+
+        /* Header & Navbar */
+        .site-header {
+            position: fixed; top: 16px; left: 0; width: 100%;
+            padding: 0 18px; z-index: 1600;
+        }
+        .navbar {
+            width: min(1180px, 100%); margin: auto;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 15px; padding: 12px 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 12px 35px rgba(0, 119, 182, 0.12);
+            transition: .35s var(--ease);
+        }
+        .night-mode .navbar {
+            background: rgba(10, 25, 47, 0.7);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-mark {
+            width: 42px; height: 42px;
+            display: grid; place-items: center; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fffef0, #f4a261 50%, #00b4d8 100%);
+            box-shadow: 0 0 15px rgba(233, 196, 106, 0.5);
+            font-size: 20px;
+        }
+        .logo-copy { font: 20px/1 'Playfair Display', serif; font-weight: 700; }
+        .logo-copy strong { display: block; margin-top: 3px; color: #0077b6; font: 8px 'Kanit', sans-serif; letter-spacing: 2px; }
+        .night-mode .logo-copy strong { color: #90e0ef; }
+
+        .nav-links { display: flex; align-items: center; gap: 24px; }
+        .nav-links a {
+            position: relative; text-decoration: none;
+            color: #1d3557; font-size: 14px; font-weight: 500; transition: .3s;
+        }
+        .night-mode .nav-links a { color: #caf0f8; }
+        .nav-links a::after {
+            content: ''; position: absolute; left: 50%; bottom: -6px;
+            width: 0; height: 2px; transform: translateX(-50%);
+            border-radius: 99px; background: linear-gradient(90deg, #e9c46a, #00b4d8);
+            transition: .3s;
+        }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+        /* Theme Switcher Button */
+        .theme-area { display: flex; align-items: center; gap: 8px; }
+        .theme-button {
+            position: relative; width: 50px; height: 28px;
+            border: 1px solid rgba(0, 119, 182, 0.2); border-radius: 99px;
+            background: linear-gradient(90deg, #fefae0, #90e0ef);
+            cursor: pointer;
+        }
+        .theme-button::after {
+            content: '☀️'; position: absolute; left: 3px; top: 2px;
+            width: 22px; height: 22px; display: grid; place-items: center;
+            border-radius: 50%; background: #fff; font-size: 11px;
+            transition: .35s var(--ease); box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .night-mode .theme-button { background: linear-gradient(90deg, #0077b6, #03045e); }
+        .night-mode .theme-button::after { content: '🌙'; left: 23px; background: #0a192f; color: #fff; }
+
+        /* Floating Music Dock */
+        .music-dock {
+            position: fixed; right: 20px; bottom: 20px; z-index: 1900;
+            width: min(320px, calc(100vw - 40px));
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+            border: 1px solid var(--glass-border); border-radius: 20px;
+            background: var(--glass-bg); backdrop-filter: blur(18px);
+            box-shadow: 0 15px 35px rgba(0, 119, 182, 0.2);
+        }
+        .night-mode .music-dock { background: rgba(10, 25, 47, 0.8); }
+        .music-orb {
+            width: 42px; height: 42px; flex: none; display: grid; place-items: center;
+            border-radius: 12px; background: linear-gradient(135deg, #e9c46a, #00b4d8);
+            color: #fff; font-size: 18px;
+        }
+        .music-details { min-width: 0; flex: 1; }
+        .music-label { color: #0077b6; font-size: 9px; letter-spacing: 2px; font-weight: 600; }
+        .night-mode .music-label { color: #90e0ef; }
+        .music-title { margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; }
+        .music-action {
+            width: 38px; height: 38px; display: grid; place-items: center;
+            border-radius: 50%; border: 1px solid rgba(0, 180, 216, 0.3);
+            background: rgba(255, 255, 255, 0.5); cursor: pointer; transition: .25s;
+        }
+        .music-action:hover { transform: scale(1.08); background: #00b4d8; color: #fff; }
+
+        .youtube-frame-wrap { position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none; }
+
+        /* Hero Section */
+        .hero {
+            position: relative; min-height: 100vh; padding: 160px 6% 90px;
+            display: flex; align-items: center; z-index: 10;
+        }
+        .hero-inner {
+            width: min(1180px, 100%); margin: auto;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;
+        }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+            border-radius: 99px; color: #0077b6; border: 1px solid rgba(0, 119, 182, 0.25);
+            background: rgba(255, 255, 255, 0.5); font-size: 11px; letter-spacing: 2px; font-weight: 500;
+        }
+        .night-mode .eyebrow { color: #90e0ef; background: rgba(255, 255, 255, 0.05); }
+        .hero h1 {
+            margin-top: 14px; font: clamp(42px, 5.5vw, 76px)/1.08 'Playfair Display', serif;
+            letter-spacing: -1px; color: #1d3557;
+        }
+        .night-mode .hero h1 { color: #f8f9fa; }
+        .hero h1 span { color: #e76f51; text-shadow: 0 0 20px rgba(231, 111, 81, 0.3); }
+        .description { margin-top: 18px; color: #457b9d; font-size: 15px; line-height: 1.9; max-width: 540px; }
+        .night-mode .description { color: #a8dadc; }
+
+        .btn-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+        .btn {
+            min-height: 48px; padding: 0 24px; border-radius: 99px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: .35s var(--ease);
+        }
+        .btn-primary {
+            color: #fff; background: linear-gradient(135deg, #00b4d8, #0077b6);
+            box-shadow: 0 10px 25px rgba(0, 119, 182, 0.3); border: none;
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 119, 182, 0.4); }
+        .btn-secondary {
+            color: #1d3557; background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 119, 182, 0.2);
+        }
+        .night-mode .btn-secondary { color: #fff; background: rgba(255, 255, 255, 0.05); border-color: rgba(255,255,255,0.2); }
+        .btn-secondary:hover { transform: translateY(-3px); border-color: #e76f51; }
+
+        /* Sun & Waves Decorative Graphic */
+        .ocean-scene { position: relative; height: 480px; display: grid; place-items: center; }
+        .sun-circle {
+            position: absolute; top: 10%; width: 140px; height: 140px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fffef0, #f4a261 60%, #e76f51 100%);
+            box-shadow: 0 0 40px rgba(244, 162, 97, 0.6);
+            transition: .6s;
+        }
+        .night-mode .sun-circle {
+            background: radial-gradient(circle at 35% 35%, #ffffff, #caf0f8 60%, #90e0ef 100%);
+            box-shadow: 0 0 40px rgba(144, 224, 239, 0.5);
+        }
+        .wave-card {
+            position: absolute; bottom: 0; width: 100%; height: 260px;
+            border-radius: 30px; border: 1px solid var(--glass-border);
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 30px; box-shadow: 0 20px 50px rgba(0, 119, 182, 0.15);
+        }
+        .wave-card h3 { font: 28px 'Playfair Display', serif; color: #0077b6; }
+        .night-mode .wave-card h3 { color: #90e0ef; }
+        .wave-card p { font-size: 13px; color: #457b9d; margin-top: 8px; }
+        .night-mode .wave-card p { color: #a8dadc; }
+
+        /* Main Section Container */
+        .section { width: min(1140px, calc(100% - 40px)); margin: auto; padding: 90px 0; }
+        .section-heading { text-align: center; max-width: 700px; margin: 0 auto 50px; }
+        .section-heading small { color: #0077b6; font-size: 10px; letter-spacing: 3px; font-weight: 600; }
+        .night-mode .section-heading small { color: #90e0ef; }
+        .section-heading h2 { margin-top: 8px; font: clamp(32px, 4vw, 52px) 'Playfair Display', serif; color: #1d3557; }
+        .night-mode .section-heading h2 { color: #f8f9fa; }
+
+        /* Glassmorphic Cards */
+        .glass {
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            box-shadow: 0 15px 45px rgba(0, 119, 182, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .night-mode .glass {
+            background: rgba(10, 25, 47, 0.55);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .glass:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0, 119, 182, 0.18); }
+
+        /* Profile Layout (No Personal Data) */
+        .profile-layout { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 24px; }
+        .profile-panel { padding: 30px; }
+        .avatar-placeholder {
+            width: 100%; aspect-ratio: 4/4; border-radius: 20px;
+            background: linear-gradient(135deg, #caf0f8, #90e0ef, #00b4d8);
+            display: grid; place-items: center; color: #0077b6; font-size: 60px;
+        }
+        .profile-name { margin-top: 20px; font: 32px 'Playfair Display', serif; }
+        .profile-role { color: #e76f51; font-size: 12px; letter-spacing: 2px; font-weight: 600; margin-top: 4px; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+        .info-card { padding: 20px; }
+        .info-card h4 { font-size: 14px; color: #0077b6; }
+        .night-mode .info-card h4 { color: #90e0ef; }
+        .info-card p { font-size: 13px; margin-top: 4px; color: #457b9d; }
+        .night-mode .info-card p { color: #a8dadc; }
+
+        /* Footer */
+        .footer {
+            padding: 60px 20px; text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .night-mode .footer { background: rgba(2, 12, 27, 0.6); }
+        .footer h3 { font: 24px 'Playfair Display', serif; }
+        .footer p { margin-top: 6px; font-size: 12px; color: #457b9d; }
+
+        /* Entry Screen Overlay */
+        .entrance {
+            position: fixed; inset: 0; z-index: 50000;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(180deg, #fefae0 0%, #90e0ef 60%, #00b4d8 100%);
+            transition: opacity 0.8s var(--ease), visibility 0.8s var(--ease);
+        }
+        .night-mode .entrance { background: linear-gradient(180deg, #020c1b 0%, #0a192f 60%, #0077b6 100%); }
+        body.loaded .entrance { opacity: 0; visibility: hidden; pointer-events: none; }
+        .entrance-box { text-align: center; padding: 40px; }
+        .entrance-box h1 { font: clamp(48px, 8vw, 90px) 'Playfair Display', serif; color: #0077b6; }
+        .night-mode .entrance-box h1 { color: #caf0f8; }
+        .entrance-button {
+            margin-top: 24px; padding: 14px 36px; border-radius: 99px;
+            border: none; background: #e76f51; color: #fff; font-size: 15px; font-weight: 600;
+            cursor: pointer; box-shadow: 0 10px 25px rgba(231, 111, 81, 0.4); transition: .3s;
+        }
+        .entrance-button:hover { transform: scale(1.05); background: #f4a261; }
+
+        @media (max-width: 900px) {
+            .hero-inner, .profile-layout { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
 </head>
 <body>
-    <!-- ฉากม่านเปิดตัวอลังการ (Grand Entrance Overlay) -->
-    <div id="ocean-curtain" class="ocean-curtain">
-        <div class="curtain-content">
-            <div class="glow-portal">
-                <div class="portal-ring"></div>
-                <div class="portal-icon">🪸</div>
+
+    <canvas id="bubbleCanvas"></canvas>
+    <div id="mouseGlow"></div>
+
+    <div class="progress"><span id="progressBar"></span></div>
+
+    <!-- Entrance Screen -->
+    <div class="entrance" id="entranceScreen">
+        <div class="entrance-box">
+            <small style="letter-spacing: 4px; color: #e76f51;">WELCOME TO</small>
+            <h1>Ocean Breeze</h1>
+            <p style="margin-top: 10px; color: #457b9d;">พอร์ตโฟลิโอสไตล์หาดทรายและท้องทะเล</p>
+            <button class="entrance-button" onclick="enterSite()">เข้าสู่เว็บไซต์ 🌊</button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="#" class="logo">
+                <div class="logo-mark">🏖️</div>
+                <div class="logo-copy">
+                    OCEAN
+                    <strong>PORTFOLIO</strong>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="#about" class="active">เกี่ยวกับฉัน</a>
+                <a href="#skills">ทักษะ</a>
+                <a href="#contact">ติดต่อ</a>
             </div>
-            <h1 class="curtain-title">REALISTIC OCEAN <span>DEPTH</span></h1>
-            <p class="curtain-sub">กดเพื่อดำดิ่งสู่โลกใต้ท้องทะเลระดับลึกพร้อมเอฟเฟกต์เสียงแบบเต็มรูปแบบ</p>
-            <button id="enter-btn" class="enter-btn">
-                <span>✨ เริ่มต้นการสำรวจ ✨</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- ระเบิดคลื่นพลังน้ำ (Shockwave Effect) -->
-    <div id="shockwave" class="shockwave"></div>
-
-    <!-- พื้นหลังท้องทะเลและสิ่งมีชีวิต -->
-    <div class="ocean-background">
-        <div class="sun-rays"></div>
-        <div class="bubble b1"></div>
-        <div class="bubble b2"></div>
-        <div class="bubble b3"></div>
-        <div class="bubble b4"></div>
-        <div class="sea-creature fish1">🐠</div>
-        <div class="sea-creature fish2">🐟</div>
-        <div class="sea-creature jellyfish">🪼</div>
-        <div class="sea-creature turtle">🐢</div>
-
-        <div class="sea-floor">
-            <div class="rock r1"></div>
-            <div class="rock r2"></div>
-            <div class="seaweed sw1"></div>
-            <div class="seaweed sw2"></div>
-            <div class="seaweed sw3"></div>
-            <div class="coral c1">🪸</div>
-            <div class="coral c2">🪸</div>
-        </div>
-    </div>
-
-    <!-- เมนูนำทาง -->
-    <header class="navbar">
-        <div class="logo">OCEAN<span>DEPTH</span></div>
-        <nav>
-            <a href="index.html" class="active">หน้าแรก</a>
-            <a href="profile.html">ประวัติส่วนตัว</a>
-            <a href="education.html">การศึกษา</a>
-            <a href="hobby.html">งานอดิเรก</a>
-            <a href="contact.html">ติดต่อ</a>
+            <div class="theme-area">
+                <button class="theme-button" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle Theme"></button>
+            </div>
         </nav>
     </header>
 
-    <!-- เนื้อหาหลัก -->
-    <main class="hero-section animate-fade-in">
-        <div class="hero-content">
-            <div class="badge">🪸 Deep Sea Reef Exploration</div>
-            <h1>สวัสดีครับ! ผมชื่อ <span class="glow-text">[กรอกชื่อ]</span></h1>
-            <p class="subtitle">นักเรียนชั้นมัธยมศึกษาปีที่ 3</p>
-            <p class="description">ยินดีต้อนรับสู่พอร์ตโฟลิโอในระบบนิเวศแนวปะการังใต้น้ำลึก รวบรวมตัวตน ทักษะ และผลงานของผมไว้อย่างสมจริง</p>
-            <div class="hero-buttons">
-                <a href="profile.html" class="btn btn-primary">รู้จักฉันมากขึ้น</a>
-                <a href="hobby.html" class="btn btn-secondary">ชมงานอดิเรก</a>
-            </div>
+    <!-- Background Music Dock -->
+    <div class="music-dock">
+        <div class="music-orb">🎵</div>
+        <div class="music-details">
+            <div class="music-label">BACKGROUND MUSIC</div>
+            <div class="music-title" id="songTitle">Ocean Waves & Vibes</div>
         </div>
-        <div class="hero-image-container">
-            <div class="avatar-glow"></div>
-            <div class="avatar-box">
-                <img src="https://placehold.co/400x400/00332c/00f5d4?text=My+Profile" alt="รูปโปรไฟล์ของฉัน">
-            </div>
-        </div>
-    </main>
+        <button class="music-action" id="playBtn" onclick="togglePlay()">▶</button>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 [กรอกชื่อ] | ชั้น ม.3/[กรอกห้อง] | โครงงานคอมพิวเตอร์ระดับมัธยมศึกษา</p>
+    <!-- Embedded Hidden YouTube Player (Custom Video ID: Bx40eP9roDc) -->
+    <div class="youtube-frame-wrap">
+        <iframe id="ytPlayer" 
+                src="https://www.youtube.com/embed/Bx40eP9roDc?enablejsapi=1&autoplay=0&loop=1&playlist=Bx40eP9roDc" 
+                allow="autoplay">
+        </iframe>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div>
+                <div class="eyebrow">🌊 BEACH & OCEAN THEME</div>
+                <h1>สายลม แสงแดด <span>และเกลียวคลื่น</span></h1>
+                <p class="description">
+                    ยินดีต้อนรับสู่พอร์ตโฟลิโอรวบรวมผลงานและการเรียนรู้ ออกแบบด้วยแรงบันดาลใจจากธรรมชาติ หาดทรายสีทอง และท้องทะเลอันกว้างใหญ่
+                </p>
+                <div class="btn-row">
+                    <a href="#about" class="btn btn-primary">สำรวจผลงาน 🐚</a>
+                    <a href="#contact" class="btn btn-secondary">ติดต่อเรา</a>
+                </div>
+            </div>
+            <div class="ocean-scene">
+                <div class="sun-circle"></div>
+                <div class="wave-card glass">
+                    <h3>Summer Vibes</h3>
+                    <p>พื้นที่รวบรวมทักษะ ผลงาน และความฝัน</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Profile Section (Generic / Blank Placeholder) -->
+    <section class="section" id="about">
+        <div class="section-heading">
+            <small>ABOUT ME</small>
+            <h2>เกี่ยวกับฉัน</h2>
+        </div>
+        <div class="profile-layout">
+            <div class="glass profile-panel" style="text-align: center;">
+                <div class="avatar-placeholder">🌴</div>
+                <h3 class="profile-name">นักเรียน / นักศึกษา</h3>
+                <p class="profile-role">STUDENT PORTFOLIO</p>
+                <p style="margin-top: 12px; font-size: 13px; color: #457b9d;">
+                    ใส่แนะนำตัวสั้นๆ ของคุณตรงนี้ เช่น ความสนใจ ความใฝ่ฝัน หรือเป้าหมายในการเรียนรู้
+                </p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="info-grid">
+                    <div class="glass info-card">
+                        <h4>🎓 การศึกษา</h4>
+                        <p>[ระบุชื่อโรงเรียน / ระดับชั้น]</p>
+                    </div>
+                    <div class="glass info-card">
+                        <h4>💡 ความสนใจ</h4>
+                        <p>[ระบุสิ่งที่ชอบ / งานอดิเรก]</p>
+                    </div>
+                    <div class="glass info-card">
+                        <h4>🎯 เป้าหมาย</h4>
+                        <p>[ระบุคณะหรืออาชีพที่ใฝ่ฝัน]</p>
+                    </div>
+                    <div class="glass info-card">
+                        <h4>📍 ที่อยู่ / จังหวัด</h4>
+                        <p>[ระบุจังหวัด]</p>
+                    </div>
+                </div>
+                <div class="glass info-card" style="flex: 1;">
+                    <h4>✨ คติประจำใจ</h4>
+                    <p style="font-style: italic; font-size: 14px; margin-top: 8px; color: #e76f51;">
+                        "การเรียนรู้เปรียบเสมือนมหาสมุทรที่ไม่มีวันสิ้นสุด"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <h3>OCEAN BREEZE PORTFOLIO</h3>
+        <p>© 2026 Student Portfolio. Designed with Waves & Sunshine.</p>
     </footer>
 
-    <!-- JavaScript ควบคุมแอนิเมชันเปิดตัวและระบบเสียง -->
     <script>
-        document.getElementById('enter-btn').addEventListener('click', function() {
-            const curtain = document.getElementById('ocean-curtain');
-            const shockwave = document.getElementById('shockwave');
+        // Entrance Curtain Toggle
+        function enterSite() {
+            document.body.classList.add('loaded');
+            togglePlay(); // Auto-play audio on entry click
+        }
 
-            // เล่นเอฟเฟกต์เสียงใต้น้ำตระการตา
-            playEpicUnderwaterSound();
+        // Dark / Light Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('night-mode');
+        }
 
-            // แสดงเอฟเฟกต์ระเบิดคลื่นพลังงาน
-            shockwave.classList.add('active');
+        // Simple Audio Controller using YouTube Embed Iframe postMessage
+        let isPlaying = false;
+        function togglePlay() {
+            const iframe = document.getElementById('ytPlayer').contentWindow;
+            const playBtn = document.getElementById('playBtn');
+            if (!isPlaying) {
+                iframe.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                playBtn.innerText = '⏸';
+                isPlaying = true;
+            } else {
+                iframe.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                playBtn.innerText = '▶';
+                isPlaying = false;
+            }
+        }
 
-            // เปิดม่านแหวกมิติ
-            curtain.classList.add('open');
-
-            // ซ่อนม่านหลังจากแอนิเมชันเสร็จสิ้น
-            setTimeout(() => {
-                curtain.style.display = 'none';
-            }, 1500);
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
         });
 
-        function playEpicUnderwaterSound() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) return;
-            
-            const ctx = new AudioContext();
+        // Mouse Glow Effect
+        const mouseGlow = document.getElementById('mouseGlow');
+        window.addEventListener('mousemove', (e) => {
+            mouseGlow.style.left = e.clientX + 'px';
+            mouseGlow.style.top = e.clientY + 'px';
+        });
 
-            // เสียง Deep Sub-Bass Drop
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(160, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 1.8);
+        // Canvas Floating Bubbles Animation
+        const canvas = document.getElementById('bubbleCanvas');
+        const ctx = canvas.getContext('2d');
+        let bubbles = [];
 
-            gain.gain.setValueAtTime(0.01, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.3);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3.0);
-
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 3.0);
-
-            // เสียง Magic Swell เรืองแสง
-            const osc2 = ctx.createOscillator();
-            const gain2 = ctx.createGain();
-            osc2.type = 'triangle';
-            osc2.frequency.setValueAtTime(300, ctx.currentTime);
-            osc2.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 1.2);
-
-            gain2.gain.setValueAtTime(0.01, ctx.currentTime);
-            gain2.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.5);
-            gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
-
-            osc2.connect(gain2);
-            gain2.connect(ctx.destination);
-            osc2.start();
-            osc2.stop(ctx.currentTime + 2.5);
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Bubble {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.radius = Math.random() * 8 + 2;
+                this.speed = Math.random() * 1.5 + 0.5;
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.y -= this.speed;
+                if (this.y < -10) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 45; i++) {
+            bubbles.push(new Bubble());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bubbles.forEach(b => {
+                b.update();
+                b.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
     </script>
 </body>
 </html>
